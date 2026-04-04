@@ -9,6 +9,8 @@ A command-line tool to parse docker-compose.yaml and .env files, pull multi-arch
 - **Multi-Architecture Images**: Supports pulling images for multiple architectures (linux/amd64, linux/arm64, etc.)
 - **Image Bundling**: Exports pulled images to tar files that can be loaded with `docker load`
 - **CLI Friendly**: Provides clear subcommands (parse, pull, bundle) with --help support
+- **Custom File Path**: Use `-f/--file` to specify a custom docker-compose file path
+- **Simplified Architecture**: Use `-i/--image-arch` for simple architecture names (amd64, arm64)
 
 ## Installation
 
@@ -24,6 +26,52 @@ git clone https://github.com/pack-compose/pack-compose.git
 cd pack-compose
 go mod tidy
 go build -o pack-compose ./cmd/pack-compose
+```
+
+### Cross-Compilation
+
+#### Linux/macOS (bash/zsh)
+
+```bash
+# Windows 64-bit
+GOOS=windows GOARCH=amd64 go build -o pack-compose-windows-amd64.exe ./cmd/pack-compose
+
+# Linux 64-bit
+GOOS=linux GOARCH=amd64 go build -o pack-compose-linux-amd64 ./cmd/pack-compose
+
+# Linux ARM64
+GOOS=linux GOARCH=arm64 go build -o pack-compose-linux-arm64 ./cmd/pack-compose
+
+# macOS Intel (amd64)
+GOOS=darwin GOARCH=amd64 go build -o pack-compose-darwin-amd64 ./cmd/pack-compose
+
+# macOS Apple Silicon (arm64)
+GOOS=darwin GOARCH=arm64 go build -o pack-compose-darwin-arm64 ./cmd/pack-compose
+```
+
+#### Windows (PowerShell)
+
+```powershell
+# Windows 64-bit (current platform)
+go build -o pack-compose.exe ./cmd/pack-compose
+
+# Linux 64-bit
+$env:GOOS="linux"; $env:GOARCH="amd64"; go build -o pack-compose-linux-amd64 ./cmd/pack-compose
+
+# Linux ARM64
+$env:GOOS="linux"; $env:GOARCH="arm64"; go build -o pack-compose-linux-arm64 ./cmd/pack-compose
+
+# macOS Intel (amd64)
+$env:GOOS="darwin"; $env:GOARCH="amd64"; go build -o pack-compose-darwin-amd64 ./cmd/pack-compose
+
+# macOS Apple Silicon (arm64)
+$env:GOOS="darwin"; $env:GOARCH="arm64"; go build -o pack-compose-darwin-arm64 ./cmd/pack-compose
+```
+
+**Clear environment variables in PowerShell:**
+```powershell
+Remove-Item Env:GOOS
+Remove-Item Env:GOARCH
 ```
 
 ## Usage
@@ -127,7 +175,9 @@ pack-compose/
 │       └── bundler.go
 ├── go.mod
 ├── go.sum
-└── README.md
+├── README.md
+├── README.en.md
+└── README.cn.md
 ```
 
 ## FAQ
@@ -142,6 +192,18 @@ docker system prune -a
 
 # Only clean up unused images
 docker image prune -a
+```
+
+### PowerShell Environment Variable Error
+
+If you see `GOOS=windows : The term 'GOOS=windows' is not recognized`, use PowerShell syntax:
+
+```powershell
+# Wrong (bash syntax)
+GOOS=windows GOARCH=amd64 go build ...
+
+# Correct (PowerShell syntax)
+$env:GOOS="windows"; $env:GOARCH="amd64"; go build ...
 ```
 
 ## License

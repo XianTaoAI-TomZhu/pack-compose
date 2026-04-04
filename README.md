@@ -9,6 +9,8 @@
 - **多架构镜像**：支持拉取多种架构的镜像（linux/amd64、linux/arm64 等）
 - **镜像打包**：将拉取的镜像导出为 tar 文件，可使用 `docker load` 完整恢复
 - **友好的 CLI**：提供清晰的子命令（parse、pull、bundle），支持 --help
+- **自定义文件路径**：使用 `-f/--file` 指定自定义的 docker-compose 文件路径
+- **简化架构名称**：使用 `-i/--image-arch` 提供简化的架构名称（amd64、arm64）
 
 ## 安装
 
@@ -24,6 +26,52 @@ git clone https://github.com/pack-compose/pack-compose.git
 cd pack-compose
 go mod tidy
 go build -o pack-compose ./cmd/pack-compose
+```
+
+### 交叉编译
+
+#### Linux/macOS (bash/zsh)
+
+```bash
+# Windows 64位
+GOOS=windows GOARCH=amd64 go build -o pack-compose-windows-amd64.exe ./cmd/pack-compose
+
+# Linux 64位
+GOOS=linux GOARCH=amd64 go build -o pack-compose-linux-amd64 ./cmd/pack-compose
+
+# Linux ARM64
+GOOS=linux GOARCH=arm64 go build -o pack-compose-linux-arm64 ./cmd/pack-compose
+
+# macOS Intel (amd64)
+GOOS=darwin GOARCH=amd64 go build -o pack-compose-darwin-amd64 ./cmd/pack-compose
+
+# macOS Apple Silicon (arm64)
+GOOS=darwin GOARCH=arm64 go build -o pack-compose-darwin-arm64 ./cmd/pack-compose
+```
+
+#### Windows (PowerShell)
+
+```powershell
+# Windows 64位（当前平台）
+go build -o pack-compose.exe ./cmd/pack-compose
+
+# Linux 64位
+$env:GOOS="linux"; $env:GOARCH="amd64"; go build -o pack-compose-linux-amd64 ./cmd/pack-compose
+
+# Linux ARM64
+$env:GOOS="linux"; $env:GOARCH="arm64"; go build -o pack-compose-linux-arm64 ./cmd/pack-compose
+
+# macOS Intel (amd64)
+$env:GOOS="darwin"; $env:GOARCH="amd64"; go build -o pack-compose-darwin-amd64 ./cmd/pack-compose
+
+# macOS Apple Silicon (arm64)
+$env:GOOS="darwin"; $env:GOARCH="arm64"; go build -o pack-compose-darwin-arm64 ./cmd/pack-compose
+```
+
+**在 PowerShell 中清除环境变量：**
+```powershell
+Remove-Item Env:GOOS
+Remove-Item Env:GOARCH
 ```
 
 ## 使用方法
@@ -127,7 +175,9 @@ pack-compose/
 │       └── bundler.go
 ├── go.mod
 ├── go.sum
-└── README.md
+├── README.md
+├── README.en.md
+└── README.cn.md
 ```
 
 ## 常见问题
@@ -142,6 +192,18 @@ docker system prune -a
 
 # 仅清理未使用的镜像
 docker image prune -a
+```
+
+### PowerShell 环境变量错误
+
+如果看到 `GOOS=windows : 无法将"GOOS=windows"项识别` 错误，请使用 PowerShell 语法：
+
+```powershell
+# 错误（bash 语法）
+GOOS=windows GOARCH=amd64 go build ...
+
+# 正确（PowerShell 语法）
+$env:GOOS="windows"; $env:GOARCH="amd64"; go build ...
 ```
 
 ## 许可证
